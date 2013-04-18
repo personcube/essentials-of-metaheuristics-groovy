@@ -64,7 +64,7 @@ class RobotBuilder {
         new File(robotDirectory).mkdir()
 		new File("${robotDirectory}/${robotPackage}").mkdir()
         File javaFile = new File("${robotDirectory}/${robotPackage}/${javaFileName}")
-        assert !javaFile.exists()
+        //assert !javaFile.exists()
         javaFile.createNewFile()
         return javaFile
     }

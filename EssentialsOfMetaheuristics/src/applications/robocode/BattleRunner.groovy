@@ -39,6 +39,7 @@ class BattleRunner {
         def lines = proc.in.text.split("\n")
         def result = -1
         lines.each { line ->
+			println line
             def pattern = ~/evolved\.Individual_${id}\s+(\d+)/
             def m = (line =~ pattern)
             if (m) {
@@ -57,7 +58,7 @@ class BattleRunner {
         def command = "ln -s ${robotDirectoryAbsolute}/Individual_${id}.jar ."
         def proc = command.execute(null, robotDir)
         proc.waitFor()
-        assert proc.err.text.equals("")
-        assert proc.exitValue() == 0
+        //assert proc.err.text.equals("")
+        //assert proc.exitValue() == 0
     }
 }

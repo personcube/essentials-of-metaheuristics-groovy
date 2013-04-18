@@ -3,7 +3,7 @@ import problems.OnesMax
 
 class MuPlusLambdaES {
     Integer numParents = 2
-    Integer numChildren = 6
+    Integer numChildren = 8
     
     def maximize(problem){
         assert numParents > 0 && numChildren > 0, "Number of parents and children must be positive"

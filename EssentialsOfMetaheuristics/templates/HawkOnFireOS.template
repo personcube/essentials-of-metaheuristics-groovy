@@ -28,11 +28,14 @@ public class Individual_${id} extends AdvancedRobot
 	static Point2D.Double lastPosition;
 	static Point2D.Double myPos;
 	static double myEnergy;
-	
+	ScannedRobotEvent lastScan; 
+	static double shotsFired;
+	static double shotsHit;
+
 //- run -------------------------------------------------------------------------------------------------------------------------------------
 	public void run()
 	{
-		setColors(Color.black,Color.red,Color.orange);
+		setColors(Color.white,Color.black,Color.black);
 		setAdjustGunForRobotTurn(true);
 		setAdjustRadarForGunTurn(true);
 		
@@ -62,9 +65,28 @@ public class Individual_${id} extends AdvancedRobot
 		double distanceToTarget = myPos.distance(target.pos);
 		
 	//**** gun ******************//
-		// HeadOnTargeting there's nothing I can say about this
+		
+		double distance = lastScan.getDistance();
+		double hitPercent = shotsHit / Math.max(shotsFired, 1d);
+		double shotPower = 1.90d; 
+		
+		if(distance < 125d){
+			shotPower = 3.0d;
+		}
+		else if(myEnergy < 10d && lastScan.getEnergy() > myEnergy) {
+			shotPower = 1d;
+		}		
+		else if(getRoundNum() > 5 && hitPercent > 0.16d){
+			shotPower = 2.5d;
+		}
+		
+		shotPower = Math.min(Math.min(Math.max(lastScan.getEnergy() / 4d, 0.1d), shotPower), myEnergy - 0.100001d);
+
+
+
 		if(getGunTurnRemaining() == 0 && myEnergy > 1) {
-			setFire( Math.min(Math.min(myEnergy/6d, 1300d/distanceToTarget), target.energy/3d) );
+			setFire(shotPower);
+			shotsFired++;
 		}
 		
 		setTurnGunRightRadians(Utils.normalRelativeAngle(calcAngle(target.pos, myPos) - getGunHeadingRadians()));
@@ -114,6 +136,12 @@ public class Individual_${id} extends AdvancedRobot
 		}
 	}
 	
+	
+	public void onBulletHit(BulletHitEvent e) {
+			shotsHit++;
+	}
+	
+	
 //- eval position ---------------------------------------------------------------------------------------------------------------------------
 	public static double evaluate(Point2D.Double p, double addLast) {
 		// this is basically here that the bot uses more space on the battlefield. In melee it is dangerous to stay somewhere too long.
@@ -129,10 +157,8 @@ public class Individual_${id} extends AdvancedRobot
 			//		but this wasn't going to give me good results
 			// -	1 / p.distanceSq(en.pos) is just the normal anti gravity thing
 			if(en.live) {
-				eval += (${enemy_energy})*en.energy;
-				eval += (${my_energy})*myEnergy;
-				eval += (${angle_diff})*(calcAngle(myPos, p) - calcAngle(en.pos, p));
-				eval += (${distance})*p.distanceSq(en.pos);
+	               eval += Math.min(en.energy/myEnergy,2) * (1 + Math.abs(Math.cos((${angle_diff})*(calcAngle(myPos, p) - calcAngle(en.pos, p))))) / p.distanceSq(en.pos);
+
 			}
 		}
 		return eval;
@@ -142,6 +168,7 @@ public class Individual_${id} extends AdvancedRobot
 	public void onScannedRobot(ScannedRobotEvent e)
 	{
 		MicroEnemy en = enemies.get(e.getName());
+		lastScan = e;
 		
 		if(en == null){
 			en = new MicroEnemy();
@@ -159,6 +186,14 @@ public class Individual_${id} extends AdvancedRobot
 		
 		// locks the radar if there is only one opponent left
 		if(getOthers()==1)	setTurnRadarLeftRadians(getRadarTurnRemainingRadians());
+		
+		/*
+		double absoluteBearing = e.getBearingRadians() + getHeadingRadians();
+		double[] dataPoint = new double[3];
+		dataPoint[0] = Math.abs(e.getVelocity()) / 8;
+		dataPoint[1] = Utils.normalAbsoluteAngle(e.getHeadingRadians() - absoluteBearing) / (2 * Math.PI);
+		dataPoint[2] = e.getEnergy() / 100;
+		*/
 	}
 	
 //- minor events ----------------------------------------------------------------------------------------------------------------------------

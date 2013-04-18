@@ -11,7 +11,7 @@ package applications.robocode
 class RoboCodeProblem {
     Integer individualCount = 0
     Integer evalCount = 0
-    Integer maxEvalCount = 100
+    Integer maxEvalCount = 1000
     Random random = new Random()
     RobotBuilder robotBuilder = new RobotBuilder("templates/HawkOnFireOS.template")
     BattleRunner battleRunner = new BattleRunner("templates/battle.template")
