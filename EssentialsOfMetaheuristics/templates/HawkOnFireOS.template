@@ -70,27 +70,29 @@ public class Individual_${id} extends AdvancedRobot
 		double hitPercent = shotsHit / Math.max(shotsFired, 1d);
 		double shotPower = 1.90d; 
 		
-		if(distance < 125d){
-			shotPower = 3.0d;
+		if(distanceToTarget < 200d){
+			shotPower = 3.5d;
 		}
+		else if(lastScan.getEnergy() < 15) {
+			shotPower = 1.0d;
+		}	
 		else if(myEnergy < 10d && lastScan.getEnergy() > myEnergy) {
-			shotPower = 1d;
+			shotPower = 2d;
 		}		
 		else if(getRoundNum() > 5 && hitPercent > 0.16d){
-			shotPower = 2.5d;
+			shotPower = 3.0d;
 		}
 		
 		shotPower = Math.min(Math.min(Math.max(lastScan.getEnergy() / 4d, 0.1d), shotPower), myEnergy - 0.100001d);
 
 
-
-		if(getGunTurnRemaining() == 0 && myEnergy > 1) {
+		if(getGunTurnRemaining() == 0 && myEnergy > 5) {
 			setFire(shotPower);
 			shotsFired++;
 		}
-		
-		setTurnGunRightRadians(Utils.normalRelativeAngle(calcAngle(target.pos, myPos) - getGunHeadingRadians()));
-		
+		//double enemyHeading = _robot.getHeadingRadians() + _lastScan.getBearingRadians();
+		//setTurnGunRightRadians(Utils.normalRelativeAngle(calcAngle(target.pos, myPos) - getGunHeadingRadians()));
+		setTurnGunRightRadians(Utils.normalRelativeAngle(getHeadingRadians() + lastScan.getBearingRadians() - getGunHeadingRadians()));		
 	//**** move *****************//
 		double distanceToNextDestination = myPos.distance(nextDestination);
 		
