@@ -31,11 +31,13 @@ public class Individual_${id} extends AdvancedRobot
 	ScannedRobotEvent lastScan; 
 	static double shotsFired;
 	static double shotsHit;
+	static final int BINS = 255;
+	
 
 //- run -------------------------------------------------------------------------------------------------------------------------------------
 	public void run()
 	{
-		setColors(Color.white,Color.black,Color.black);
+		setColors(Color.white,Color.white,Color.black);
 		setAdjustGunForRobotTurn(true);
 		setAdjustRadarForGunTurn(true);
 		
@@ -77,22 +79,24 @@ public class Individual_${id} extends AdvancedRobot
 			shotPower = 1.0d;
 		}	
 		else if(myEnergy < 10d && lastScan.getEnergy() > myEnergy) {
-			shotPower = 2d;
+			shotPower = 2.0d;
 		}		
 		else if(getRoundNum() > 5 && hitPercent > 0.16d){
 			shotPower = 3.0d;
 		}
 		
-		shotPower = Math.min(Math.min(Math.max(lastScan.getEnergy() / 4d, 0.1d), shotPower), myEnergy - 0.100001d);
+		shotPower = Math.min(Math.min(Math.max(lastScan.getEnergy() / 4d, 0.1d), shotPower), myEnergy*(${my_energy}) + 3d);
 
 
 		if(getGunTurnRemaining() == 0 && myEnergy > 5) {
 			setFire(shotPower);
 			shotsFired++;
-		}
-		//double enemyHeading = _robot.getHeadingRadians() + _lastScan.getBearingRadians();
+		}	
+
 		//setTurnGunRightRadians(Utils.normalRelativeAngle(calcAngle(target.pos, myPos) - getGunHeadingRadians()));
-		setTurnGunRightRadians(Utils.normalRelativeAngle(getHeadingRadians() + lastScan.getBearingRadians() - getGunHeadingRadians()));		
+		setTurnGunRightRadians(Utils.normalRelativeAngle(getHeadingRadians() + (lastScan.getBearingRadians() + 0.005) - getGunHeadingRadians()));		
+	
+	
 	//**** move *****************//
 		double distanceToNextDestination = myPos.distance(nextDestination);
 		
@@ -189,13 +193,7 @@ public class Individual_${id} extends AdvancedRobot
 		// locks the radar if there is only one opponent left
 		if(getOthers()==1)	setTurnRadarLeftRadians(getRadarTurnRemainingRadians());
 		
-		/*
-		double absoluteBearing = e.getBearingRadians() + getHeadingRadians();
-		double[] dataPoint = new double[3];
-		dataPoint[0] = Math.abs(e.getVelocity()) / 8;
-		dataPoint[1] = Utils.normalAbsoluteAngle(e.getHeadingRadians() - absoluteBearing) / (2 * Math.PI);
-		dataPoint[2] = e.getEnergy() / 100;
-		*/
+			
 	}
 	
 //- minor events ----------------------------------------------------------------------------------------------------------------------------
